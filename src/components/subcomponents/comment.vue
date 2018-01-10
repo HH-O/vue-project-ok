@@ -2,7 +2,7 @@
   <div class="cmt-container">
     <h3>发表评论</h3>
     <hr>
-    <textarea placeholder="请输入要BB的内容（做多吐槽120字）" maxlength="120"  v-model="msg"></textarea>
+    <textarea placeholder="请输入要评论的内容（120字以内）" maxlength="120"  v-model="msg"></textarea>
 
     <mt-button type="primary" size="large"  @click="postComment">发表评论</mt-button>
 
@@ -38,29 +38,15 @@ export default {
   },
   methods: {
     getComments() {
-      // 获取评论
-      // this.$http
-      //   .get("api/getcomments/" + this.id + "?pageindex=" + this.pageIndex)
-      //   .then(result => {
-      //     if (result.body.status === 0) {
-      //       // this.comments = result.body.message;
-      //       // 每当获取新评论数据的时候，不要把老数据清空覆盖，而是应该以老数据，拼接上新数据
-      //       this.comments = this.comments.concat(result.body.message);
-      //     } else {
-      //       Toast("获取评论失败！");
-      //     }
-      //   });
-
         this.$http.get('api/getcomments/' + this.id + '?pageindex=' + this.pageIndex)
         .then( result => {
           if(result.body.status === 0){
             //加载更多评论  不清空之前的评论 拼接评论数组
             this.comments = this.comments.concat(result.body.message);
-
+            //返回数据为空时 提示用户无更多数据
              if(result.body.message.length === 0){
                Toast('到底啦~~不要再加载啦')
             }
-     
           } else {
             Toast('获得评论失败')
           }
@@ -71,6 +57,7 @@ export default {
       this.pageIndex++;
       this.getComments();
     },
+    //提交评论
     postComment(){
       if(this.msg.trim().length === 0){
         return Toast('评论不能为空')

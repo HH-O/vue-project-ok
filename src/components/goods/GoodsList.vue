@@ -1,58 +1,63 @@
 <template>
   <div class="goods-list">
     
-    <div class="goods-item">
-      <img src="http://ofv795nmp.bkt.clouddn.com//upload/201504/20/thumb_201504200119256512.jpg" alt="">
-      <h1 class="title">小米（Mi）小米Note 16G双网通版</h1>
+    <div class="goods-item" v-for="item in goodslist" :key="item.id" @click="goDetail(item.id)">
+      <img :src="item.img_url" alt="">
+      <h1 class="title">{{ item.title }}</h1>
       <div class="info">
         <p class="price">
-          <span class="now">￥899</span>
-          <span class="old">￥999</span>
+          <span class="now">￥{{ item.sell_price }}</span>
+          <span class="old">￥{{ item.market_price }}</span>
         </p>
         <p class="sell">
           <span>热卖中</span>
-          <span>剩60件</span>
+          <span>剩{{ item.stock_quantity }}件</span>
         </p>
       </div>
     </div>
+    <mt-button type="danger" size="large" @click="getMore">加载更多</mt-button>
 
-    <div class="goods-item">
-      <img src="http://ofv795nmp.bkt.clouddn.com//upload/201504/20/thumb_201504200214471783.jpg" alt="">
-      <h1 class="title">尼康(Nikon)D3300套机（18-55mm f/3.5-5.6G VRII）（黑色）</h1>
-      <div class="info">
-        <p class="price">
-          <span class="now">￥899</span>
-          <span class="old">￥999</span>
-        </p>
-        <p class="sell">
-          <span>热卖中</span>
-          <span>剩60件</span>
-        </p>
-      </div>
-    </div>
 
-    <div class="goods-item">
-      <img src="http://ofv795nmp.bkt.clouddn.com//upload/201504/20/thumb_201504200119256512.jpg" alt="">
-      <h1 class="title">小米（Mi）小米Note 16G双网通版</h1>
-      <div class="info">
-        <p class="price">
-          <span class="now">￥899</span>
-          <span class="old">￥999</span>
-        </p>
-        <p class="sell">
-          <span>热卖中</span>
-          <span>剩60件</span>
-        </p>
-      </div>
-    </div>
 
+   
   </div>
 </template>
 
 <script>
+export default {
+  data(){
+    return {
+      pageindex: 1, //默认加载第一页
+      goodslist: []  //私有的商品数据
+    }
+  },
+  created(){
+    this.getGoodsList()
+  },
+  methods:{
+    //页面载入 渲染商品列表
+    getGoodsList(){
+      this.$http.get("api/getgoods?pageindex=" + this.pageindex).then( result => {
+        if(result.body.status === 0){
+          this.goodslist = this.goodslist.concat(result.body.message);
+        }  
+      })
+    },
+    //点击加载更多商品
+    getMore(){
+      this.pageindex++
+      this.getGoodsList()
+    },
+    //前往商品详情页面  this.$router.push()编程式是航
+    goDetail(id){
+      this.$router.push({ name: "goodsinfo", params: { id } });
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>
+// 实现经典两列布局
 .goods-list{
   display: flex;
   flex-wrap: wrap;

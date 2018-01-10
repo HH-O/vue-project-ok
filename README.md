@@ -120,4 +120,152 @@
 4. 注意： 每个 图片数据对象中，必须有 w 和 h 属性, 若获取的数据中没有, 需要遍历数据每一项, 添加 w 和 h 属性
 
 ## 绘制 商品列表 页面基本结构并美化
+## 导入评论子组件
+
+## 商品列表 页面制作
+1. 使用flex布局 justify-content: space-between; 实现经典两列布局(flex-direction: column; 改变主轴让每个商品内部上下两列布局)
+2. 使用编程式导航,点击前往商品详情页面,商品ID为参数
+
+## 注册 vuex
+```
+import Vuex from 'vuex'
+Vue.use(Vuex)
+
+// 页面载入冬本地内存获取购物车产品数据
+var car = JSON.parse(localStorage.getItem("car") || "[]");
+
+var store = new Vuex.Store({
+    state: {
+        car: car //购物车产品数据
+    },
+    mutations: {
+        //添加商品到购物车
+        addToCar(state, goodsinfo){
+            var flag = false;
+            //添加的是购物车中已有商品就将数量相加,否则添加该商品的全部信息
+            state.car.some(item => {
+            if(item.id === goodsinfo.id){
+                item.count += parseInt(goodsinfo.count);
+                flag = true;
+                return true;
+            }
+            })
+            if(!flag){
+                state.car.push(goodsinfo);
+            }
+            localStorage.setItem("car", JSON.stringify(state.car))
+        },
+        //将shopcar_numbox组件中变化的购物车产品数量跟新到store中
+        updateGoodsInfo(state, goodsinfo){
+            state.car.some( item => {
+                if(item.id == goodsinfo.id){
+                    item.count = JSON.parse(goodsinfo.count);
+                    return true;
+                }
+                
+            })
+            localStorage.setItem("car", JSON.stringify(state.car))
+        },
+        // 根据Id，从store 中的购物车中删除对应的那条商品数据
+        removeFormCar(state, id){
+            state.car.some((item, i) => {
+                if(item.id == id){
+                    state.car.splice(i, 1)
+                    return true
+                }
+            })
+            localStorage.setItem("car", JSON.stringify(state.car))
+        },
+        //将shopcar_numbox组件中购物车选中状态更新到store中
+        updateGoodsSelected(state, info){
+            state.car.forEach( item => {
+                if(item.id == info.id){
+                    item.selected = info.selected;
+                }
+            })
+            localStorage.setItem("car", JSON.stringify(state.car))
+        }
+    },
+    getters: {
+        //将购买数量加入到app组件的购物车徽章上显示
+        getAllCount(state){
+            var c = 0;
+            state.car.forEach( item => {
+                c += item.count;
+            })
+            return c
+        },
+        //定义一个{[id: count]} 对象 向外暴露 去初始化渲染shopcar_numbox购物车购买数量
+        getGoodsCount(state){
+            var o = {};
+            state.car.forEach( item => {
+                o[item.id]= item.count;
+            })
+            return o
+        },
+        //定义一个{[id: selected]} 对象 向外暴露 购物车选中状态
+        getGoodsSelected(state){
+            var o = {};
+            state.car.forEach( item => {
+                o[item.id]= item.selected;
+            })
+            return o
+        },
+        //计算勾选物品的总数量 与 总价
+        getGoodsCountAndAmount(state) {
+            var o = {
+                count: 0, // 勾选的数量
+                amount: 0 // 勾选的总价
+            }
+            state.car.forEach(item => {
+                if (item.selected) {
+                    o.count += item.count
+                    o.amount += item.price * item.count
+                }
+            })
+            return o
+        }
+    }
+})
+```
+## 商品详情 页面制作
+1. 导入swiper轮播图组件
+2. 获取轮播图数据, 先循环轮播图数组的每一项，为 item 添加 img 属性，因为 轮播图 组件中，只认识 item.img， 不认识 item.src
+3. 使用this.$route.params.id 取得商品id, 挂载到data中, 方便后期调用
+4. 获取商品详细信息, 渲染页面
+5. 创建一个数字选择框子组件
+ + 使用MUI的数字选择框 引入js   初始化:mui(".mui-numbox").numbox();
+ + 监听 父组件传递的最大商品数量值, 使用 JS API 设置 numbox 的最大值, 并且每当子组件数据变化时, 立即把 最新的数据，通过事件调用，传递给父组件    
+6. 制作加入购物车的小球半场动画
+ + 利用钩子函数before-enter enter after-enter
+ + 先得到 徽标的 横纵 坐标，再得到 小球的 横纵坐标，然后 让 y 值 求差， x 值也求 差，得到 的结果，就是横纵坐标要位移的距离
+ + 获得小球位置: document.getBoundingClientRect("原生DOM")
+7. 点击加入购物车按钮 将选中的商品加入到购物车中
+ + 手动拼接一个对象 传递给store 的car
+ + 利用vuex 触发main.js中addToCar() 添加商品进入购物车, 遍历本地存储中购物车已有记录, 若新添加的是购物车中已有商品就将数量相加,否则添加该商品的全部信息, 再讲新的记录存储到本地localStorage.setItem("car", JSON.stringify(state.car))
+8. 点击使用编程式导航跳分别转到 图文介绍页面, 评论页面
+
+## 商品图文 页面制作
+ + 获取商品图文数据
+## 商品评论 页面制作
+ + 引入comment评论组件
+
+## 购物车 页面制作
+1. 使用MUI 中 卡片视图组件 实现页面布局
+2. 使用mint-ui 中的switch 组件 实现选中按钮
+ + 绑定事件 selectedChanged 触发 store中事件 将选中状态更新到store中 并重新存储到本地
+3. 使用MUI的数字选择框 引入js   初始化:mui(".mui-numbox").numbox();\
+ + 父组件获得共有数据$store.getters.getGoodsCount[item.id] 属性绑定:initcount 传值给数据选择框子组件
+ + 将从父组件传来的初始购买数量 渲染到页面中 :value="initcount"
+ + changes事件 将数量的变化 触发store中 updateGoodsInfo()事件 更新到store中 
+4. 从store中获取购物车商品对应的id 创建一个数组 当做参数去请求ajax数据 得到的商品信息 渲染到页面中
+5. 定义删除购物车商品方法 
+ + 删除当前组件中选中的商品的数据
+ + 触发store中删除本地存储中的商品记录方法 并重新将数据存储到本地
+6. 将store 计算勾选物品的总数量 与 总价 渲染到当前组件中
+
+ 
+ 
+
+
 

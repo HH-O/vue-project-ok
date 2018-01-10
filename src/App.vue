@@ -19,7 +19,8 @@
 				<span class="mui-tab-label">会员</span>
 			</router-link>
 			<router-link class="mui-tab-item-llb" to="/shopcar">
-				<span class="mui-icon mui-icon-extra mui-icon-extra-cart"><span class="mui-badge">0</span></span>
+                                                                                                            <!-- 从store获取购物车总数量渲染到徽标上 -->
+				<span class="mui-icon mui-icon-extra mui-icon-extra-cart" id="badge"><span class="mui-badge">{{ $store.getters.getAllCount}}</span></span>
 				<span class="mui-tab-label">购物车</span>
 			</router-link>
 			<router-link class="mui-tab-item-llb" to="/search">
@@ -44,11 +45,11 @@ export default {
 </script>
 
 
-
 <style scoped>
 .mint-header{
   z-index: 99;
 }
+/* 组件切换动画 */
 .app-container{
         padding-top: 40px;
         padding-bottom: 50px;

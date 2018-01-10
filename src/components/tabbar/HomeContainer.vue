@@ -1,12 +1,7 @@
 <template>
     <div>
-        <!-- 轮播图区域 -->
-        <mt-swipe :auto="4000">
-        <mt-swipe-item v-for="item in lunbotulist" :key="item.img">
-            <img :src="item.img" alt="">
-        </mt-swipe-item>
-        
-        </mt-swipe>
+        <!-- 轮播图区域                   决定图片width是否100% -->
+        <swiper :lunbotuList='lunbotulist' :isfull='true'></swiper>
 
         <!-- 九宫格 到 6宫格 的改造 -->
         <ul class="mui-table-view mui-grid-view mui-grid-9">
@@ -52,6 +47,8 @@
 
 <script>
 import { Toast } from 'mint-ui';
+import swiper from "../subcomponents/swiper.vue";
+// import {HTTP}  from "../common.js";
     export default {
         data () {
             return {
@@ -64,31 +61,31 @@ import { Toast } from 'mint-ui';
         methods:{
             getlunbitu(){
                 this.$http.get('api/getlunbo').then( res => {
-                    // console.log(res.body)
+                    console.log(res.body.message)
                    if(res.body.status === 0){
                         this.lunbotulist = res.body.message;
                    } else {
                        Toast('啊哈,图片走丢了');
                    }
                 })
+                //使用axios  获取数据
+                // HTTP.get('api/getlunbo').then( res => {
+                //     console.log(res.data.message)
+                //    if(res.data.status === 0){
+                //         this.lunbotulist = res.data.message;
+                //    } else {
+                //        Toast('啊哈,图片走丢了');
+                //    }
+                // })
             }
-        }
+        },
+        components: {
+            swiper
+     }
     }
 </script>
 
 <style lang="scss" scoped>
-.mint-swipe{
-    height: 200px;
-
-    .mint-swipe-item {
-       
-        img {
-            width: 100%;
-            height: 100%;
-        }
-    }
-} 
-
 .mui-grid-view.mui-grid-9 {
         background-color: #fff;
         border: none;
