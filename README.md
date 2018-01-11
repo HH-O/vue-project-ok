@@ -94,8 +94,8 @@
  4. 在初始化 滑动条 的时候，导入的 mui.js ，但是，控制台报错： `Uncaught TypeError: 'caller', 'callee', and 'arguments' properties may not be accessed on strict mode`
   + 经过合理的推测，可能是 mui.js 中用到了 'caller', 'callee', and 'arguments' 东西，但是， webpack 打包好的 bundle.js 中，默认是启用严格模式的，所以，这两者冲突了；
   + 解决方案： 1. 把 mui.js 中的 非严格 模式的代码改掉；但是不现实； 2. 把 webpack 打包时候的严格模式禁用掉；
-  + 最终，我们选择了  移除严格模式： 下载使用这个插件 babel-plugin-transform-remove-strict-mode 并在.babel 文件中配置 plugins 属性
- 5. 当 滑动条 调试OK后, tabbar 无法正常工作，推测 mui 中tabbar的样式名`mui-tab-item` 与滑动条有冲突, 此时，我们需要把 每个 tabbar 按钮的 样式中  `mui-tab-item` 重新改一下名字, 将原样式复制到新的样式名中 再应用到标签中；
+  + 最终，选择了  移除严格模式： 下载使用这个插件 babel-plugin-transform-remove-strict-mode 并在.babel 文件中配置 plugins 属性
+ 5. 当 滑动条 调试OK后, tabbar 无法正常工作，推测 mui 中tabbar的样式名`mui-tab-item` 与滑动条有冲突, 此时，需要把 每个 tabbar 按钮的 样式中  `mui-tab-item` 重新改一下名字, 将原样式复制到新的样式名中 再应用到标签中；
  6. 获取所有分类，并在滑动条中渲染 分类列表； 
 取消谷歌浏览器中滑动条滑动时的警告 * { touch-action: pan-y; }
 
